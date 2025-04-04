@@ -200,7 +200,7 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000') # Frontend URL
 # ----------------------------------------------
 SPECTACULAR_SETTINGS = {
     'TITLE': 'AreaLink API',
-    'DESCRIPTION': '<h1>Collage Area Management API</h1>',
+    'DESCRIPTION': '<h1>College Area Management API</h1>',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS

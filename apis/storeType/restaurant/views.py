@@ -95,3 +95,6 @@ class RestaurantInfoView(generics.GenericAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Restaurant.DoesNotExist:
             return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        
