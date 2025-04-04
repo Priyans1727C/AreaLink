@@ -3,5 +3,5 @@ from .views import  RestaurantInfoView
 
 urlpatterns = [
     # path('', index, name='restaurant_index'),
-    path('info/', RestaurantInfoView.as_view(), name='restaurant_detail'),
+    path('info/', RestaurantInfoView.as_view(), name='restaurant_info'),
 ]

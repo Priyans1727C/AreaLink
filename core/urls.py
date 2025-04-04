@@ -22,7 +22,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/stores/', include('apis.stores.urls')),
-    
+    path('api/restaurant/', include('apis.storeType.restaurant.urls')),
     
     
     #dfr_spectacular
