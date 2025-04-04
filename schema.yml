@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: AreaLink API
+  version: 1.0.0
+  description: Collage Area Management API
+paths:
+  /api/stores/restaurant/info/:
+    get:
+      operationId: api_stores_restaurant_info_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantInfo'
+          description: ''
+    post:
+      operationId: api_stores_restaurant_info_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantInfo'
+          description: ''
+    put:
+      operationId: api_stores_restaurant_info_update
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantInfo'
+          description: ''
+    delete:
+      operationId: api_stores_restaurant_info_destroy
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    RestaurantInfo:
+      type: object
+      description: Serializer for the Restaurant model.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: restaurant name
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          description: Short description of the restaurant
+        address:
+          type: string
+          description: Full address of the restaurant
+        city:
+          type: string
+          description: City where the restaurant is located
+          maxLength: 100
+        state:
+          type: string
+          description: State where the restaurant is located
+          maxLength: 100
+        pincode:
+          type: string
+          description: Postal code of the restaurant
+          maxLength: 10
+        phone:
+          type: string
+          nullable: true
+          description: restaurant contact number
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: restaurant email address
+          maxLength: 254
+        opening_time:
+          type: string
+          format: time
+          description: Opening time of the restaurant
+        closing_time:
+          type: string
+          format: time
+          description: Closing time of the restaurant
+        is_active:
+          type: boolean
+          description: Whether the restaurant is active or not
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Time when the restaurant was created
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Last updated timestamp
+        store:
+          type: integer
+          description: User who owns the restaurant.
+      required:
+      - address
+      - city
+      - closing_time
+      - created_at
+      - id
+      - name
+      - opening_time
+      - pincode
+      - state
+      - store
+      - updated_at
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -48,6 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apis.accounts',
+    'apis.stores',
+    'apis.storeType.restaurant',
+    
+    'drf_spectacular', # Added drf_spectacular for OpenAPI schema generation, API documentation
+    
 ]
 
 MIDDLEWARE = [
@@ -126,7 +131,7 @@ STATICFILES_DIRS = [
 # ----------------------------------------------
 # Custom User Model
 # ----------------------------------------------
-# AUTH_USER_MODEL = 'authentication.CustomUser'
+AUTH_USER_MODEL = 'accounts.User'
 
 # ----------------------------------------------
 # REST Framework and JWT Settings
@@ -135,6 +140,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', # Use drf_spectacular for OpenAPI schema generation, API documentation
 }
 
 SIMPLE_JWT = {
@@ -186,3 +193,15 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@localhost')
 
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000') # Frontend URL for email verification link
+
+
+# ----------------------------------------------
+# drf_spectacular Settings
+# ----------------------------------------------
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'AreaLink API',
+    'DESCRIPTION': 'Collage Area Management API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

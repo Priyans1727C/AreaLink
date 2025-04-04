@@ -33,18 +33,18 @@ class Store(models.Model):
     )
     description = models.TextField(blank=True, null=True, help_text=_("Short description of the store"))
     
-    address = models.TextField(help_text=_("Full address of the store"))
-    city = models.CharField(max_length=100, help_text=_("City where the store is located"))
-    state = models.CharField(max_length=100, help_text=_("State where the store is located"))
-    pincode = models.CharField(max_length=10, help_text=_("Postal code of the store"))
+    # address = models.TextField(help_text=_("Full address of the store"))
+    # city = models.CharField(max_length=100, help_text=_("City where the store is located"))
+    # state = models.CharField(max_length=100, help_text=_("State where the store is located"))
+    # pincode = models.CharField(max_length=10, help_text=_("Postal code of the store"))
 
-    phone = models.CharField(max_length=20, blank=True, null=True, help_text=_("Store contact number"))
-    email = models.EmailField(blank=True, null=True, help_text=_("Store email address"))
+    # phone = models.CharField(max_length=20, blank=True, null=True, help_text=_("Store contact number"))
+    # email = models.EmailField(blank=True, null=True, help_text=_("Store email address"))
 
-    opening_time = models.TimeField(help_text=_("Opening time of the store"))
-    closing_time = models.TimeField(help_text=_("Closing time of the store"))
+    # opening_time = models.TimeField(help_text=_("Opening time of the store"))
+    # closing_time = models.TimeField(help_text=_("Closing time of the store"))
 
-    is_active = models.BooleanField(default=True, help_text=_("Whether the store is active or not"))
+    # is_active = models.BooleanField(default=True, help_text=_("Whether the store is active or not"))
 
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the store was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
