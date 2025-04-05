@@ -34,3 +34,9 @@ staticfiles/
 
 
 apidoc.md
+
+# Ignore all migration files
+**/migrations/*.py
+
+# But don't ignore __init__.py
+!**/migrations/__init__.py

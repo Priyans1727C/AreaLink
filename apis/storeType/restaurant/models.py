@@ -1,7 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from apis.stores.models import Store
+from django.conf import settings
 
 # Create your models here.
 class Restaurant(models.Model):
@@ -51,6 +53,9 @@ class Restaurant(models.Model):
 class Menu(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     category_name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the restaurant was created"))
+    updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
+
 
     def __str__(self):
         return self.category_name
@@ -63,8 +68,45 @@ class MenuItem(models.Model):
     image_url = models.URLField(blank=True, null=True)
     is_available = models.BooleanField(default=True)
     is_vegetarian = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the restaurant was created"))
+    updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
+
 
     def __str__(self):
         return self.name
     
     
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Processing", "Processing"),
+        ("Delivered", "Delivered"),
+        ("Cancelled", "Cancelled"),
+    ]
+
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name="orders")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
+    order_date = models.DateTimeField(auto_now_add=True)
+    delivery_address = models.TextField(blank=True, null=True)
+    order_status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Pending")
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the restaurant was created"))
+    updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
+
+    def __str__(self):
+        return f"Order {self.id} - {self.user.username}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    item = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name="order_items")
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
+    special_instructions = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the restaurant was created"))
+    updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
+
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item.name}"
