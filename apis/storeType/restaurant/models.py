@@ -51,7 +51,7 @@ class Restaurant(models.Model):
 
 
 class Menu(models.Model):
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menus')
     category_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the restaurant was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))

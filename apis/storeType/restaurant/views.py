@@ -1,8 +1,8 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Restaurant
-from .serializers import RestaurantInfoSerializer
-
+from rest_framework.views import APIView
+from .models import Restaurant, Menu
+from .serializers import RestaurantInfoSerializer, MenuSerializer, MenuItemSerializer, OrderSerializer, OrderItemSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
@@ -96,5 +96,84 @@ class RestaurantInfoView(generics.GenericAPIView):
         except Restaurant.DoesNotExist:
             return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
         
-        
-        
+
+
+class MenuView(APIView):
+    """
+    Handles CRUD operations for Restaurant Menus.
+    """
+
+    def get_restaurant(self, store_id):
+        try:
+            return Restaurant.objects.get(store_id=store_id)
+        except Restaurant.DoesNotExist:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        store_id = request.query_params.get('store_id')
+        if not store_id:
+            return Response({"error": "store_id is required", "params": "/?store_id=<int>"}, status=status.HTTP_400_BAD_REQUEST)
+
+        restaurant = self.get_restaurant(store_id)
+        if not restaurant:
+            return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        menus = restaurant.menus.all()
+        serializer = MenuSerializer(menus, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        store_id = request.data.get('store')
+        if not store_id:
+            return Response({"error": "store_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        restaurant = self.get_restaurant(store_id)
+        if not restaurant:
+            return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MenuSerializer(data=request.data.get('attributes', request.data))
+        if serializer.is_valid():
+            serializer.save(restaurant=restaurant)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        store_id = request.data.get('store')
+        menu_id = request.data.get('id')
+
+        if not store_id or not menu_id:
+            return Response({"error": "store_id and menu_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        restaurant = self.get_restaurant(store_id)
+        if not restaurant:
+            return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            menu = restaurant.menus.get(id=menu_id)
+        except Menu.DoesNotExist:
+            return Response({"error": "Menu not found with the given id"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MenuSerializer(menu, data=request.data.get('attributes', request.data), partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        store_id = request.query_params.get('store_id')
+        menu_id = request.query_params.get('menu_id')
+
+        if not store_id or not menu_id:
+            return Response({"error": "store_id and menu_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        restaurant = self.get_restaurant(store_id)
+        if not restaurant:
+            return Response({"error": "Restaurant not found for the given store_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            menu = restaurant.menus.get(id=menu_id)
+        except Menu.DoesNotExist:
+            return Response({"error": "Menu not found with the given id"}, status=status.HTTP_404_NOT_FOUND)
+
+        menu.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
