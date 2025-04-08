@@ -271,6 +271,7 @@ class OrderView(APIView):
     Handles CRUD operations for Orders.
     """
 
+
     def get_order(self, store_id ,order_id):
         try:
             restaurant = Restaurant.objects.get(store_id=store_id)
@@ -409,7 +410,6 @@ class OrderItemView(APIView):
     """
     Handles CRUD operations for Order Items.
     """
-
     def get_order(self, store_id ,order_id):
         try:
             restaurant = Restaurant.objects.get(store_id=store_id)
@@ -428,40 +428,51 @@ class OrderItemView(APIView):
         if not order:
             return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
 
-        order_items = order.order_items.all()
+        order_items = order.items.all()
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request, *args, **kwargs):
         store_id = request.data.get('store_id')
         order_id = request.data.get('order_id')
-        user_id =  request.data.get('user_id')
-        item_id =  request.data.get('item_id')
+        item_id = request.data.get('item_id')          #menu item id
+        request.data['item'] = item_id
+        request.data['order'] = order_id
 
-        if not order_id or not item_id:
-            return Response({"error": "order_id and item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([store_id, order_id, item_id]):
+            return Response({"error": "store_id, order_id and item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = self.get_order(order_id)
-        if not order:
-            return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = OrderItemSerializer(data=request.data.get('attributes', request.data))
-        if serializer.is_valid():
-            serializer.save(order=order, item=item_id)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def put(self, request, *args, **kwargs):
-        order_id = request.data.get('order_id')
-        item_id = request.data.get('item_id')
-
-        if not order_id or not item_id:
-            return Response({"error": "order_id and item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        order = self.get_order(order_id)
+        order = self.get_order(store_id, order_id)
         if not order:
             return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            order_item = order.items.get(id=item_id)
+            menu_item = MenuItem.objects.get(id=item_id)
+        except MenuItem.DoesNotExist:
+            return Response({"error": "MenuItem not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrderItemSerializer(data=request.data.get('attributes', request.data))
+        if serializer.is_valid():
+            serializer.save(order=order, item=menu_item)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def put(self, request, *args, **kwargs):
+        store_id = request.data.get('store_id')
+        order_id = request.data.get('order_id')
+        order_item_id = request.data.get('item_id')  # ID of OrderItem, not MenuItem
+
+        if not all([store_id, order_id, order_item_id]):
+            return Response({"error": "store_id, order_id, and item_id (OrderItem.id) are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        order = self.get_order(store_id, order_id)
+        if not order:
+            return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            order_item = order.items.get(id=order_item_id)
         except OrderItem.DoesNotExist:
             return Response({"error": "OrderItem not found with the given id"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -469,24 +480,26 @@ class OrderItemView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
     def delete(self, request, *args, **kwargs):
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
         order_id = request.query_params.get('order_id') or request.data.get('order_id')
-        item_id = request.query_params.get('item_id') or request.data.get('item_id')
+        order_item_id = request.query_params.get('item_id') or request.data.get('item_id')
 
-        if not order_id or not item_id:
-            return Response({"error": "order_id and item_id are required", "params": "/?order_id=<int>&item_id=<int>"}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([store_id, order_id, order_item_id]):
+            return Response({"error": "store_id, order_id and item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = self.get_order(order_id)
+        order = self.get_order(store_id, order_id)
         if not order:
             return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            order_item = order.items.get(id=item_id)
+            order_item = order.items.get(id=order_item_id)
         except OrderItem.DoesNotExist:
             return Response({"error": "OrderItem not found with the given id"}, status=status.HTTP_404_NOT_FOUND)
 
         order_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    

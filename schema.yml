@@ -2,13 +2,23 @@ openapi: 3.0.3
 info:
   title: AreaLink API
   version: 1.0.0
-  description: Collage Area Management API
+  description: <h1>College Area Management API</h1>
 paths:
-  /api/stores/restaurant/info/:
+  /api/restaurant/info/:
     get:
-      operationId: api_stores_restaurant_info_retrieve
+      operationId: restaurant_info_retrieve
+      description: |-
+        Retrieve restaurant information.
+        If store_id is provided, it will return the restaurant information for that store.
+      summary: Retrieve data, optionally filtered by store ID
+      parameters:
+      - in: query
+        name: store_id
+        schema:
+          type: integer
+        description: Optional ID of the store to filter data for.
       tags:
-      - api
+      - restaurant
       security:
       - jwtAuth: []
       - {}
@@ -17,12 +27,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestaurantInfo'
+                type: object
+                additionalProperties: {}
           description: ''
     post:
-      operationId: api_stores_restaurant_info_create
+      operationId: restaurant_info_create
+      description: |-
+        Add a new restaurant entry.
+        The request should contain a JSON object with the restaurant details.
       tags:
-      - api
+      - restaurant
       requestBody:
         content:
           application/json:
@@ -46,9 +60,12 @@ paths:
                 $ref: '#/components/schemas/RestaurantInfo'
           description: ''
     put:
-      operationId: api_stores_restaurant_info_update
+      operationId: restaurant_info_update
+      description: |-
+        Update an existing restaurant entry.
+        The request should contain a JSON object with the updated restaurant details.
       tags:
-      - api
+      - restaurant
       requestBody:
         content:
           application/json:
@@ -72,9 +89,469 @@ paths:
                 $ref: '#/components/schemas/RestaurantInfo'
           description: ''
     delete:
-      operationId: api_stores_restaurant_info_destroy
+      operationId: restaurant_info_destroy
+      description: |-
+        Delete an existing restaurant entry.
+        The request should contain the store_id of the restaurant to be deleted.
       tags:
-      - api
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/restaurant/menu/:
+    get:
+      operationId: restaurant_menu_retrieve
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: restaurant_menu_create
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: restaurant_menu_update
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: restaurant_menu_destroy
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/restaurant/menu/item/:
+    get:
+      operationId: restaurant_menu_item_retrieve
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: restaurant_menu_item_create
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: restaurant_menu_item_update
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: restaurant_menu_item_destroy
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/restaurant/order/:
+    get:
+      operationId: restaurant_order_retrieve
+      description: Handles CRUD operations for Orders.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: restaurant_order_create
+      description: Handles CRUD operations for Orders.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: restaurant_order_update
+      description: Handles CRUD operations for Orders.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: restaurant_order_destroy
+      description: Handles CRUD operations for Orders.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/restaurant/order/item/:
+    get:
+      operationId: restaurant_order_item_retrieve
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: restaurant_order_item_create
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: restaurant_order_item_update
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: restaurant_order_item_destroy
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - restaurant
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/stores/restaurant/info/:
+    get:
+      operationId: stores_restaurant_info_retrieve
+      description: |-
+        Retrieve restaurant information.
+        If store_id is provided, it will return the restaurant information for that store.
+      summary: Retrieve data, optionally filtered by store ID
+      parameters:
+      - in: query
+        name: store_id
+        schema:
+          type: integer
+        description: Optional ID of the store to filter data for.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: stores_restaurant_info_create
+      description: |-
+        Add a new restaurant entry.
+        The request should contain a JSON object with the restaurant details.
+      tags:
+      - stores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantInfo'
+          description: ''
+    put:
+      operationId: stores_restaurant_info_update
+      description: |-
+        Update an existing restaurant entry.
+        The request should contain a JSON object with the updated restaurant details.
+      tags:
+      - stores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestaurantInfo'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantInfo'
+          description: ''
+    delete:
+      operationId: stores_restaurant_info_destroy
+      description: |-
+        Delete an existing restaurant entry.
+        The request should contain the store_id of the restaurant to be deleted.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/stores/restaurant/menu/:
+    get:
+      operationId: stores_restaurant_menu_retrieve
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: stores_restaurant_menu_create
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: stores_restaurant_menu_update
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: stores_restaurant_menu_destroy
+      description: Handles CRUD operations for Restaurant Menus.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/stores/restaurant/menu/item/:
+    get:
+      operationId: stores_restaurant_menu_item_retrieve
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: stores_restaurant_menu_item_create
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: stores_restaurant_menu_item_update
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: stores_restaurant_menu_item_destroy
+      description: Handles CRUD operations for Menu Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/stores/restaurant/order/:
+    get:
+      operationId: stores_restaurant_order_retrieve
+      description: Handles CRUD operations for Orders.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: stores_restaurant_order_create
+      description: Handles CRUD operations for Orders.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: stores_restaurant_order_update
+      description: Handles CRUD operations for Orders.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: stores_restaurant_order_destroy
+      description: Handles CRUD operations for Orders.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/stores/restaurant/order/item/:
+    get:
+      operationId: stores_restaurant_order_item_retrieve
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: stores_restaurant_order_item_create
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: stores_restaurant_order_item_update
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - stores
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: stores_restaurant_order_item_destroy
+      description: Handles CRUD operations for Order Items.
+      tags:
+      - stores
       security:
       - jwtAuth: []
       - {}
