@@ -410,18 +410,21 @@ class OrderItemView(APIView):
     Handles CRUD operations for Order Items.
     """
 
-    def get_order(self, order_id):
+    def get_order(self, store_id ,order_id):
         try:
-            return Order.objects.get(id=order_id)
-        except Order.DoesNotExist:
+            restaurant = Restaurant.objects.get(store_id=store_id)
+            return restaurant.orders.get(id=order_id)
+        except (Restaurant.DoesNotExist, Order.DoesNotExist):
             return None
     def get(self, request, *args, **kwargs):
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
         order_id = request.query_params.get('order_id') or request.data.get('order_id')
+        user_id = request.query_params.get('`user_id`') or request.data.get('user_id')
 
-        if not order_id:
-            return Response({"error": "order_id is required", "params": "/?order_id=<int>"}, status=status.HTTP_400_BAD_REQUEST)
+        if not order_id or not store_id:
+            return Response({"error": "store_id and order_id is required", "params": "/?order_id=<int>"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = self.get_order(order_id)
+        order = self.get_order(store_id, order_id)
         if not order:
             return Response({"error": "Order not found for the given order_id"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -429,8 +432,10 @@ class OrderItemView(APIView):
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     def post(self, request, *args, **kwargs):
+        store_id = request.data.get('store_id')
         order_id = request.data.get('order_id')
-        item_id = request.data.get('item_id')
+        user_id =  request.data.get('user_id')
+        item_id =  request.data.get('item_id')
 
         if not order_id or not item_id:
             return Response({"error": "order_id and item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
