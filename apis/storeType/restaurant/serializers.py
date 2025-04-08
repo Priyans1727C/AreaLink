@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Restaurant, Menu, MenuItem, Order, OrderItem
+from .models import Restaurant, Menu, MenuItem, Order, OrderItem, CartItem
 from django.utils.translation import gettext_lazy as _
 
 
@@ -78,6 +78,20 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
         extra_kwargs = {
             'order': {'required': True},
+            'item': {'required': True},
+            'quantity': {'required': True}
+        }
+
+class CartItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the CartItem model.
+    """
+    class Meta:
+        model = CartItem
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+        extra_kwargs = {
+            'user': {'required': True},
             'item': {'required': True},
             'quantity': {'required': True}
         }

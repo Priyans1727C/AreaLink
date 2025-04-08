@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Restaurant, Menu, MenuItem, Order, OrderItem
+from .models import Restaurant, Menu, MenuItem, Order, OrderItem, CartItem
 # Register your models here.
 
 class RestaurantAdmin(admin.ModelAdmin):
@@ -46,3 +46,12 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 admin.site.register(OrderItem, OrderItemAdmin)
+
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'item', 'quantity')
+    search_fields = ('user',)
+    list_filter = ('user',)
+    ordering = ('-user',)
+    list_per_page = 20
+
+admin.site.register(CartItem, CartItemAdmin)
