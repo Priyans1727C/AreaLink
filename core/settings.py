@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'apis.accounts',
     'apis.stores',
-    'apis.storeType.restaurant',
     'apis.storeType.general',
+    'apis.storeType.restaurant',
+    'apis.storeType.grocery',
     
     'drf_spectacular', # Added drf_spectacular for OpenAPI schema generation, API documentation
     
