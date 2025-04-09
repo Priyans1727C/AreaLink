@@ -514,6 +514,14 @@ class CartItemView(APIView):
             return CartItem.objects.filter(user_id=user_id)
         except CartItem.DoesNotExist:
             return None
+    def get_item(self, store_id, item_id):
+        try:
+            restaurant = Restaurant.objects.get(store_id=store_id)
+            return MenuItem.objects.get(menu__restaurant=restaurant, id=item_id)
+        except (Restaurant.DoesNotExist, MenuItem.DoesNotExist):
+            return None
+
+        
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id') or request.data.get('user_id')
         if not user_id:
@@ -525,3 +533,56 @@ class CartItemView(APIView):
 
         serializer = CartItemSerializer(cart_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        item_id = request.data.get('item_id')
+        store_id = request.data.get('store_id')
+        
+        if not all([user_id, item_id, store_id]):
+            return Response({"error": "user_id, item_id and store_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+     
+        user = get_user_model()
+        try:
+            user = user.objects.get(id=user_id)
+        except user.DoesNotExist:
+            return Response({"error": "Invalid user_id"}, status=status.HTTP_400_BAD_REQUEST)
+        if not user:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        menu_item = self.get_item(store_id, item_id)
+        if not menu_item:
+            return Response({"error": "MenuItem not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        request.data['item'] = item_id
+        request.data['user'] = user_id
+        request.data['store'] = store_id
+        serializer = CartItemSerializer(data=request.data.get('attributes', request.data))
+        if serializer.is_valid():
+            serializer.save(user=user, item=menu_item)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        cart_item_id = request.data.get('cart_item_id')
+
+        if not all([user_id, cart_item_id]):
+            return Response({"error": "user_id and cart_item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+        user = get_user_model()
+        try:
+            user = user.objects.get(id=user_id)
+        except user.DoesNotExist:
+            return Response({"error": "Invalid user_id"}, status=status.HTTP_400_BAD_REQUEST)
+        if not user:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            cart_item = CartItem.objects.get(id=cart_item_id, user=user)
+        except CartItem.DoesNotExist:
+            return Response({"error": "CartItem not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CartItemSerializer(cart_item, data=request.data.get('attributes', request.data), partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
