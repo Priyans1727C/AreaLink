@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import  RestaurantInfoView, MenuView, MenuItemView, OrderView, OrderItemView
+from .views import  RestaurantInfoView, MenuView, MenuItemView, OrderView, OrderItemView, CartItemView
 
 urlpatterns = [
     # path('', index, name='restaurant_index'),
@@ -8,5 +8,6 @@ urlpatterns = [
     path('menu/item/', MenuItemView.as_view(), name='restaurant_menu_item_detail'),
     path('order/', OrderView.as_view(), name='restaurant_order_detail'),
     path('order/item/', OrderItemView.as_view(), name='restaurant_order_item_detail'),
+    path('cart/', CartItemView.as_view(), name='restaurant_cart_item_detail'),
     
 ]

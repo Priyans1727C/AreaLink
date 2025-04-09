@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Restaurant, Menu, MenuItem, Order, OrderItem, CartItem
-from .serializers import RestaurantInfoSerializer, MenuSerializer, MenuItemSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import RestaurantInfoSerializer, MenuSerializer, MenuItemSerializer, OrderSerializer, OrderItemSerializer, CartItemSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.contrib.auth import get_user_model
@@ -503,3 +503,25 @@ class OrderItemView(APIView):
 
         order_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CartItemView(APIView):
+    """
+    Handles CRUD operations for Cart Items.
+    """
+    def get_cart(self, user_id):
+        try:
+            return CartItem.objects.filter(user_id=user_id)
+        except CartItem.DoesNotExist:
+            return None
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+        if not user_id:
+            return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_items = self.get_cart(user_id)
+        if not cart_items:
+            return Response({"error": "Cart not found for the given user_id"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CartItemSerializer(cart_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
