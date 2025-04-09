@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/stores/', include('apis.stores.urls')),
     path('api/restaurant/', include('apis.storeType.restaurant.urls')),
-    
+    path('api/grocery/', include('apis.storeType.grocery.urls')),
     
     #dfr_spectacular
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -50,7 +50,7 @@ class Store(models.Model):
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
     def __str__(self):
-        return f"{self.name} ({self.get_type_display()} - {self.owner.username})"
+        return f"{self.name} - {self.type}"
 
     class Meta:
         ordering = ['-created_at']
