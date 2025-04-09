@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apis.accounts',
     'apis.stores',
     'apis.storeType.restaurant',
+    'apis.storeType.general',
     
     'drf_spectacular', # Added drf_spectacular for OpenAPI schema generation, API documentation
     

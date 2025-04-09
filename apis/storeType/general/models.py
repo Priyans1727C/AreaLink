@@ -37,15 +37,8 @@ class StoreInfo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the store was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
-    def __str__(self):
-        return f"{self.store.name}"
-
     class Meta:
-        ordering = ['-created_at']
-        verbose_name = "store"
-        verbose_name_plural = "stores"
-
-
+        abstract = True
 
 
 
@@ -56,9 +49,10 @@ class StoreCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the store was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
+    class Meta:
+        abstract = True
+         
 
-    def __str__(self):
-        return self.category_name
 
 class StoreItem(models.Model):
     menu = models.ForeignKey(StoreCategory, on_delete=models.CASCADE, related_name='store_items')
@@ -72,9 +66,9 @@ class StoreItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
 
-    def __str__(self):
-        return self.name
-    
+    class Meta:
+        abstract = True
+       
     
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -94,9 +88,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the store order was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
-    def __str__(self):
-        return f"{self.user.username} - {self.order_status}"
-
+    class Meta:
+        abstract = True
+       
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
@@ -107,11 +101,10 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the orderItem was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
-
-    def __str__(self):
-        return f"{self.quantity} x {self.item.name}"
-    
-    
+    class Meta:
+        abstract = True
+       
+       
 class CartItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="cart_items")
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="cart_items")
@@ -119,5 +112,6 @@ class CartItem(models.Model):
     quantity = models.IntegerField(validators=[MinValueValidator(1)])
     added_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.item.name} ({self.quantity})"
+    class Meta:
+        abstract = True
+
