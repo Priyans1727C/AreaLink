@@ -586,3 +586,26 @@ class CartItemView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def delete(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+        cart_item_id = request.query_params.get('cart_item_id') or request.data.get('cart_item_id')
+
+        if not all([user_id, cart_item_id]):
+            return Response({"error": "user_id and cart_item_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_user_model()
+        try:
+            user = user.objects.get(id=user_id)
+        except user.DoesNotExist:
+            return Response({"error": "Invalid user_id"}, status=status.HTTP_400_BAD_REQUEST)
+        if not user:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            cart_item = CartItem.objects.get(id=cart_item_id, user=user)
+        except CartItem.DoesNotExist:
+            return Response({"error": "CartItem not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
