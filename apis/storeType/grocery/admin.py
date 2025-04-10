@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import GroceryStoreInfo, GroceryStoreCategory, GroceryStoreItem, GroceryOrder, GroceryOrderItem
+from .models import GroceryStoreInfo, GroceryStoreCategory, GroceryStoreItem, GroceryOrder, GroceryOrderItem, GroceryCartItem
+
 
 # Register your models here.
 class GroceryStoreInfoAdmin(admin.ModelAdmin):
@@ -17,7 +18,10 @@ class  GroceryOrderAdmin(admin.ModelAdmin):
 class GroceryOrderItemAdmin(admin.ModelAdmin):
     list_display = ('order', 'item', 'quantity')
 
+class GroceryCartItemAdmin(admin.ModelAdmin):
+    list_display = ('store', 'user', 'item')
 
+admin.site.register(GroceryCartItem, GroceryCartItemAdmin)
 admin.site.register(GroceryOrderItem, GroceryOrderItemAdmin)
 admin.site.register(GroceryOrder, GroceryOrderAdmin)
 admin.site.register(GroceryStoreInfo, GroceryStoreInfoAdmin)

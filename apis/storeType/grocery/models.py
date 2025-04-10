@@ -44,3 +44,13 @@ class GroceryOrderItem(base_models.OrderItem):
     """
     order = models.ForeignKey(GroceryOrder, on_delete=models.CASCADE, related_name="grocery_order_items")
     item = models.ForeignKey(GroceryStoreItem, on_delete=models.CASCADE, related_name="grocery_order_items")
+    
+    
+class GroceryCartItem(base_models.CartItem):
+    """
+    Model to create cart in grocery store.
+    Each cart is related to a specific grocery store and contains items from that store.
+    """
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="grocery_cart")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="grocery_cart")
+    item = models.ForeignKey(GroceryStoreItem, on_delete=models.CASCADE, related_name="grocery_cart_items")
