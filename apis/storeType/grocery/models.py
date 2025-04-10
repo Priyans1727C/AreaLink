@@ -8,3 +8,12 @@ class GroceryStoreInfo(base_models.StoreInfo):
     Each grocery store is owned by a registered user with the role of 'shop_owner'.
     """
     pass
+
+
+class GroceryStoreCategory(base_models.StoreCategory):
+    """
+    Model to store categories of grocery items.
+    Each category is related to a specific grocery store.
+    """
+    pass
+

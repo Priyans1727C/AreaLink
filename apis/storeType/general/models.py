@@ -45,7 +45,7 @@ class StoreInfo(models.Model):
 
 class StoreCategory(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='store_categories')
-    category_name = models.CharField(max_length=100)
+    category_name = models.CharField(max_length=100, unique=True, help_text=_("Category name"))
     created_at = models.DateTimeField(auto_now_add=True, help_text=_("Time when the store was created"))
     updated_at = models.DateTimeField(auto_now=True, help_text=_("Last updated timestamp"))
 
