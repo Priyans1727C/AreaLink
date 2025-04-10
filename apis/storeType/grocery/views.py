@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from rest_framework import status
-from .serializers import GroceryStoreInfoSerializer, GroceryStoreCategorySerializer, GroceryStoreItemSerializer
+from .serializers import GroceryStoreInfoSerializer, GroceryStoreCategorySerializer, GroceryStoreItemSerializer, GroceryOrderSerializer, GroceryOrderItemSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from .models import GroceryStoreInfo, GroceryStoreCategory, GroceryStoreItem
+from .models import GroceryStoreInfo, GroceryStoreCategory, GroceryStoreItem, GroceryOrder, GroceryOrderItem
 from apis.stores.models import Store
 
 # Create your views here.
@@ -239,3 +239,190 @@ class GroceryStoreItemView(APIView):
             return Response({"error": "Grocery store item not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+class GroceryOrderView(APIView):
+    """
+    API view for handling grocery orders.
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Get a list of grocery orders.
+        """
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+        if not store_id and not user_id:
+            return Response({"error": "store_id and user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            grocery_store = Store.objects.get(id=store_id)
+            orders = grocery_store.grocery_orders.filter(user=user_id)  
+            serializer = GroceryOrderSerializer(orders, many=True)
+            return Response(serializer.data)
+        except Store.DoesNotExist:
+            return Response({"error": "Grocery store not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def post(self, request, *args, **kwargs):
+        """
+        Create a grocery order.
+        """
+        store_id = request.data.get('store_id')
+        user_id = request.data.get('user_id')
+        order_id = request.data.get('order_id')
+        if not store_id or not user_id:
+            return Response({"error": "store_id and user_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            store_instance = Store.objects.get(id=store_id)
+            user_instance = get_user_model().objects.get(id=user_id)
+
+            if order_id:
+                # Update existing order
+                grocery_order = GroceryOrder.objects.get(id=order_id, store=store_instance, user=user_instance)
+                serializer = GroceryOrderSerializer(grocery_order, data=request.data, partial=True)
+            else:
+                # Create new order
+                serializer = GroceryOrderSerializer(data={**request.data, "store": store_instance.id, "user": user_instance.id})
+
+            if serializer.is_valid():
+                serializer.save()
+                status_code = status.HTTP_200_OK if order_id else status.HTTP_201_CREATED
+                return Response(serializer.data, status=status_code)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Store.DoesNotExist:
+            return Response({"error": "Store with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "User with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except GroceryOrder.DoesNotExist:
+            return Response({"error": "Grocery order not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete a grocery order.
+        """
+        order_id = request.query_params.get('order_id') or request.data.get('order_id')
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+        if not order_id and not store_id and not user_id:
+            return Response({"error": "order_id, store_id and user_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            grocery_order = GroceryOrder.objects.get(id=order_id, store=store_id, user=user_id)
+            grocery_order.delete()
+            return Response({"message": "Grocery order deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except GroceryOrder.DoesNotExist:
+            return Response({"error": "Grocery order not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+ 
+class GroceryOrderItemView(APIView):
+    """
+    API view for handling grocery order items.
+    """
+    def get(self, request, *args, **kwargs):
+        # Get query params or data
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+        order_id = request.query_params.get('order_id') or request.data.get('order_id')
+
+        if not store_id or not user_id:
+            return Response({"error": "store_id and user_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            if order_id:
+                # Fetch items for a specific order
+                grocery_order = GroceryOrder.objects.get(id=order_id, store_id=store_id, user_id=user_id)
+                order_items = grocery_order.grocery_order_items.all()
+            else:
+                # Fetch all order items from orders matching store + user
+                order_items = GroceryOrderItem.objects.filter(order__store_id=store_id, order__user_id=user_id)
+
+            serializer = GroceryOrderItemSerializer(order_items, many=True)
+            return Response(serializer.data)
+
+        except GroceryOrder.DoesNotExist:
+            return Response({"error": "Grocery order not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Store.DoesNotExist:
+            return Response({"error": "Grocery store not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def post(self, request, *args, **kwargs):
+        """
+        Create or update grocery order items.
+        """
+        store_id = request.data.get('store_id')
+        user_id = request.data.get('user_id')
+        order_id = request.data.get('order_id')
+        order_item_id = request.data.get('order_item_id')
+
+        if not store_id or not user_id or not order_id:
+            return Response({"error": "store_id, user_id and order_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            store_instance = Store.objects.get(id=store_id)
+            user_instance = get_user_model().objects.get(id=user_id)
+
+            if order_item_id:
+                # Update existing order item
+                grocery_order = GroceryOrder.objects.get(id=order_id, store=store_instance, user=user_instance)
+                grocery_order_item = GroceryOrderItem.objects.get(order=grocery_order, id=order_item_id)
+                serializer = GroceryOrderItemSerializer(grocery_order_item, data=request.data, partial=True)
+            else:
+                # Create new order item
+                serializer = GroceryOrderItemSerializer(data={**request.data, "order": order_id})
+
+            if serializer.is_valid():
+                serializer.save()
+                status_code = status.HTTP_200_OK if order_item_id else status.HTTP_201_CREATED
+                return Response(serializer.data, status=status_code)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Store.DoesNotExist:
+            return Response({"error": "Store with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "User with given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except GroceryOrder.DoesNotExist:
+            return Response({"error": "Grocery order not found"}, status=status.HTTP_404_NOT_FOUND)
+        except GroceryOrderItem.DoesNotExist:
+            return Response({"error": "Grocery order item not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete a grocery order item.
+        """
+        order_item_id = request.query_params.get('order_item_id') or request.data.get('order_item_id')
+        store_id = request.query_params.get('store_id') or request.data.get('store_id')
+        user_id = request.query_params.get('user_id') or request.data.get('user_id')
+
+        if not all([order_item_id, store_id, user_id]):
+            return Response(
+                {"error": "order_item_id, store_id, and user_id are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            grocery_order_item = GroceryOrderItem.objects.get(
+                id=order_item_id,
+                order__store_id=store_id,
+                order__user_id=user_id
+            )
+            grocery_order_item.delete()
+            return Response(
+                {"message": "Grocery order item deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except GroceryOrderItem.DoesNotExist:
+            return Response(
+                {"error": "Grocery order item not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
