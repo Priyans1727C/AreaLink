@@ -55,8 +55,8 @@ class StoreCategory(models.Model):
 
 
 class StoreItem(models.Model):
-    menu = models.ForeignKey(StoreCategory, on_delete=models.CASCADE, related_name='store_items')
-    name = models.CharField(max_length=255)
+    # category = models.ForeignKey(StoreCategory, on_delete=models.CASCADE, related_name='store_items')
+    item_name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image_url = models.URLField(blank=True, null=True)

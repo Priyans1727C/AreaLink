@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import GroceryStoreInfo, GroceryStoreCategory
+from .models import GroceryStoreInfo, GroceryStoreCategory, GroceryStoreItem
 
 class GroceryStoreInfoSerializer(serializers.ModelSerializer):
     """
@@ -36,4 +36,22 @@ class GroceryStoreCategorySerializer(serializers.ModelSerializer):
             'name': {'required': True},
             'type': {'required': True},
             'description': {'required': False}
+        }
+
+class GroceryStoreItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the GroceryStoreItem model.
+    """
+    class Meta:
+        model = GroceryStoreItem
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+        extra_kwargs = {
+            'category': {'required': True},
+            'name': {'required': True},
+            'description': {'required': False},
+            'price': {'required': True},
+            'image_url': {'required': False},
+            'is_available': {'required': False}
+            
         }

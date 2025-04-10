@@ -17,3 +17,10 @@ class GroceryStoreCategory(base_models.StoreCategory):
     """
     pass
 
+
+class GroceryStoreItem(base_models.StoreItem):
+    """
+    Model to store items in a grocery store.
+    Each item is related to a specific category in the grocery store.
+    """
+    category = models.ForeignKey(GroceryStoreCategory, on_delete=models.CASCADE, related_name='store_items')
