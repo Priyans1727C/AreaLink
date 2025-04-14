@@ -25,7 +25,7 @@ load_dotenv()
 # ----------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATE_DIR = os.path.join(CORE_DIR, "templates")
+TEMPLATE_DIR = os.path.join(CORE_DIR, "./templates")
 ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static')
 
 # ----------------------------------------------
@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     'apis.storeType.restaurant',
     'apis.storeType.grocery',
     
+    
+    
+    'channels',
+    'apis.chat',
     'drf_spectacular', # Added drf_spectacular for OpenAPI schema generation, API documentation
     
 ]
@@ -74,7 +78,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR],
+        'DIRS': [TEMPLATE_DIR, 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,7 +160,8 @@ SIMPLE_JWT = {
 # CORS Settings
 # ----------------------------------------------
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+# CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
@@ -206,4 +211,18 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
+}
+
+
+# ----------------------------------------------
+# Channels Settings
+# ----------------------------------------------
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"  # For development
+        # "BACKEND": "channels_redis.core.RedisChannelLayer", # For production (requires Redis)
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
+    },
 }
