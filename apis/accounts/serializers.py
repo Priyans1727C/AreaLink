@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from . models import UserProfile
 
 
 
@@ -99,3 +100,24 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data["new_password"])  # Hash the password
         user.save()
         return user  # Ensure user is returned for debugging
+    
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'user')
+        read_only_fields = ('id', 'user')
+        extra_kwargs = {
+            'bio': {'required': False},
+            'profile_picture': {'required': False}
+        }
+        
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('bio', 'profile_picture')
+        extra_kwargs = {
+            'bio': {'required': False},
+            'profile_picture': {'required': False}
+        }
+

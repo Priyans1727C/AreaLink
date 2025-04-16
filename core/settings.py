@@ -10,16 +10,21 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
 import os
-from datetime import timedelta
+from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # ----------------------------------------------
 # Load environment variables from .env file
 # ----------------------------------------------
-load_dotenv()
+# Set the path to your .env file explicitly
+dotenv_path = Path(__file__).resolve().parent / '.env'
 
+# Load the .env file and force override
+load_dotenv(dotenv_path=dotenv_path, override=True)
+
+print("JWT_ACCESS_TOKEN_LIFETIME:", os.getenv("JWT_ACCESS_TOKEN_LIFETIME"))
 # ----------------------------------------------
 # Basic Imports and Paths
 # ----------------------------------------------
@@ -151,10 +156,12 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_TOKEN_LIFETIME', 1))),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_REFRESH_TOKEN_LIFETIME', 5))),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=10),
     # Additional settings can be added here for extra security
 }
+
+
 
 # ----------------------------------------------
 # CORS Settings
@@ -199,7 +206,8 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@localhost')
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000') # Frontend URL for email verification link
+# FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000') # Frontend URL for email verification link
+FRONTEND_URL = 'http://127.0.0.1:5173'  # Frontend URL for email verification link
 
 
 # ----------------------------------------------
